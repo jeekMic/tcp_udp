@@ -106,7 +106,7 @@ class MainWindow(tcp_logic.TcpLogic, udp_logic.UdpLogic, web_logic.WebLogic):
     def slotInformation(self):
         reply = QMessageBox.question(self, '提示', '确认现在对云台进行更新?', QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if reply == QMessageBox.Yes:
-            self.tcp_send(Constant.update)
+            self.tcp_send(init_code=Constant.update)
         else:
             pass
 

@@ -8,6 +8,7 @@ class ToolsUi(QDialog):
     # 信号槽机制：设置一个信号，用于触发接收区写入动作
     signal_write_msg = QtCore.pyqtSignal(str)
 
+
     def __init__(self, num):
         """
         初始化窗口
@@ -87,16 +88,17 @@ class ToolsUi(QDialog):
         self.label_dir.setWordWrap(True)  # 让label自动换行
         self.pushButton_unlink.setEnabled(False)
         self.textBrowser_recv.insertPlainText("这是窗口-%s\n" % self.num)
-
+        self.lineEdit_port.setText(str(6000))
         # 调用布局方法和控件显示文字的方法
         self.layout_ui()
         self.ui_translate()
         self.connect()
+
     def show_message(self):
         QMessageBox.information(self, "提示", "文件加载成功",
                                 QMessageBox.Yes)
     def show_message_error(self, error_id):
-        message = ""
+        message = "未知异常"
         if error_id == 32:
             message = "擦除备份区失败"
             pass
@@ -107,7 +109,7 @@ class ToolsUi(QDialog):
             message = "擦除源码区失败"
             pass
         elif error_id == 36:
-            message = "更新区代码复制失败"
+            message = "更新区代码复制到源码区失败"
         elif error_id == 38:
             message = "恢复失败,错误代码38"
             pass
@@ -116,8 +118,7 @@ class ToolsUi(QDialog):
         elif error_id == 35:
             message = "恭喜您! 程序执行完毕！设备更新正常"
             pass
-        QMessageBox.information(self, "提示", message,
-                                QMessageBox.Yes)
+        return message
     def layout_ui(self):
         """
         设置控件的布局

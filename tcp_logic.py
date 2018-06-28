@@ -1,3 +1,5 @@
+import codecs
+import os
 from typing import Union
 
 from PyQt5 import QtWidgets
@@ -13,9 +15,13 @@ from constant import Constant
 import binascii
 import struct
 
+
 class TcpLogic(tcp_udp_web_ui.ToolsUi):
     def __init__(self, num):
         super(TcpLogic, self).__init__(num)
+        self.finish_all = None
+        self.total = None
+        self.send_socket = None
         self.tcp_socket = None
         self.sever_th = None
         self.client_th = None
@@ -41,15 +47,17 @@ class TcpLogic(tcp_udp_web_ui.ToolsUi):
                 self.contents.setText(data)
 
     def tcp_server_start(self):
+        print("-----开启服务器-----------")
         """
         功能函数，TCP服务端开启的方法
         :return: None
         """
         self.tcp_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        # 取消主动断开连接四次握手后的TIME_WAIT状态
-        self.tcp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        # 设定套接字为非阻塞式
-        self.tcp_socket.setblocking(False)
+
+        # # 取消主动断开连接四次握手后的TIME_WAIT状态
+        # self.tcp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 50)
+        # # 设定套接字为非阻塞式
+        # self.tcp_socket.setblocking(False)
         try:
             port = int(self.lineEdit_port.text())
             self.tcp_socket.bind(('', port))
@@ -57,6 +65,7 @@ class TcpLogic(tcp_udp_web_ui.ToolsUi):
             msg = '请检查端口号\n'
             self.signal_write_msg.emit(msg)
         else:
+            print("服务器正在监听---------")
             self.tcp_socket.listen()
             self.sever_th = threading.Thread(target=self.tcp_server_concurrency)
             self.sever_th.start()
@@ -64,70 +73,83 @@ class TcpLogic(tcp_udp_web_ui.ToolsUi):
             self.signal_write_msg.emit(msg)
 
     def tcp_server_concurrency(self):
-        """
-        功能函数，供创建线程的方法；
-        使用子线程用于监听并创建连接，使主线程可以继续运行，以免无响应
-        使用非阻塞式并发用于接收客户端消息，减少系统资源浪费，使软件轻量化
-        :return:None
-        """
         while True:
-            try:
-                client_socket, client_address = self.tcp_socket.accept()
-            except Exception as ret:
-                pass
-            else:
-                client_socket.setblocking(False)
-                # 将创建的客户端套接字存入列表,client_address为ip和端口的元组
-                self.client_socket_list.append((client_socket, client_address))
-                msg = 'TCP服务端已连接IP:%s端口:%s\n' % client_address
-                self.signal_write_msg.emit(msg)
-            # 轮询客户端套接字列表，接收数据
-            for client, address in self.client_socket_list:
-                try:
-                    recv_msg = client.recv(1024)
-                except Exception as ret:
-                    pass
-                else:
-                    if recv_msg:
-                        if len(recv_msg)<5:
-                            return 
-                        msg = recv_msg.decode('utf-8')
-                        code, res = Constant.parse_receive(msg)
-                        msg = '来自IP:{}端口:{}:\n{}\n{}'.format(address[0], address[1], msg, res)
-                        print("-----------------")
-                        self.signal_write_msg.emit(msg)
-                        self.parse_code(code, res)
-                    else:
-                        client.close()
-                        self.client_socket_list.remove((client, address))
+            clientsock, clientaddress = self.tcp_socket.accept()
+            print('connect from:', clientaddress)
+            msg = "检测到 客户端 :" + str(clientaddress) + "已经连接\n"
+            self.signal_write_msg.emit(msg)
+            # self.client_socket_list.append((clientsock, clientaddress))
+            # 传输数据都利用clientsock，和s无关
+            t = threading.Thread(target=self.tcplink, args=(clientsock, clientaddress))  # t为新创建的线程
+            t.start()
+
+    def tcplink(self, sock, addr):
+        result = []
+        while True:
+            print("------1")
+            if addr[1] == 5000:
+                self.send_socket = sock
+
+            recvdata = sock.recv(2048)
+            result = []
+            for i in recvdata:
+                result.append(hex(i))
+            if len(result) < 5:
+                return
+            code, res = Constant.parse_receive(result)
+            msg = '来自IP:{}端口:{}:\n{}\n{}'.format(addr[0], addr[1], recvdata, res)
+            self.signal_write_msg.emit(msg)
+            self.parse_code(code, res)
+            if recvdata == 'exit' or not recvdata:
+                break
+
+            # clientsock.send(b' ')
+        sock.close()
+        self.send_socket = None
 
     def parse_code(self, code, res):
         if code == 12:
-            print(self.arrs[0])
-            self.tcp_send(' '.join(self.arrs[self.flag]))
+            # if self.flag >= self.total:
+            #     self.tcp_send(data = str(Constant.finish))
+            #     return
+            self.tcp_send(data=''.join(self.arrs[self.flag]))
+            num_str = "已经发送数据包" + str(self.flag)
+            self.signal_write_msg.emit(num_str)
             self.flag += 1
-        elif code == 34:
-            if self.flag >= 43:
-                self.tcp_send(str(Constant.finish))
+            # if self.flag == self.total:
+            #     # 所有的包发送完毕并且成功发送需要发送一条告诉设备已经发送完毕的指令
+            #     self.tcp_send(data=str(Constant.finish))
+        elif code == 14:
+            print("-------------", self.flag, "-------", self.total)
+            if self.flag >=self.total:
+                self.signal_write_msg.emit("结束包正在发送---------\n")
+                print("结束包正在发送---------\n")
+                print(''.join(self.finish_all))
+                self.tcp_send(data=''.join(self.finish_all))
+                self.signal_write_msg.emit("结束包发送成功---------\n")
+                print("结束包发送成功---------\n")
                 return
-            print(self.arrs[0])
-            self.tcp_send(' '.join(self.arrs[self.flag]))
+
+            self.tcp_send(data=''.join(self.arrs[self.flag]))
+            num_str = "已经发送数据包" + str(self.flag)+"\n"
+            self.signal_write_msg.emit(num_str)
             self.flag += 1
-            if self.flag == 43:
-                # 所有的包发送完毕并且成功发送需要发送一条告诉设备已经发送完毕的指令
-                self.tcp_send(str(Constant.finish))
+            # if self.flag == self.total:
+            #     # 所有的包发送完毕并且成功发送需要发送一条告诉设备已经发送完毕的指令
+            #     self.tcp_send(data = str(Constant.finish))
         elif code == 13:
-            self.signal_write_msg.emit("第%d位数据包发送错误,正在重新发送....\n"%(res+1))
-            self.tcp_send(' '.join(self.arrs[res]))
+            self.signal_write_msg.emit("第%d位数据包发送错误,正在重新发送....\n" % (res + 1))
+            self.tcp_send(data=' '.join(self.arrs[res]))
             # 数据包错误，并且第八位为错误的包序号,需要重复的包号
             self.signal_write_msg.emit("数据包已经重新发送\n")
         elif code == 33:
-            self.signal_write_msg.emit('write is failed')
+            self.signal_write_msg.emit('write is failed\n')
         elif code == 15:
-            self.signal_write_msg.emit('update is failed')
+            self.signal_write_msg.emit('update is failed\n')
         else:
-            print("其他异常")
-            self.show_message_error(code)
+            print("-------------------其他异常")
+            print(code)
+            self.signal_write_msg.emit(self.show_message_error(code))
 
     def tcp_client_start(self):
         """
@@ -165,7 +187,7 @@ class TcpLogic(tcp_udp_web_ui.ToolsUi):
                 msg = recv_msg.decode('utf-8')
                 msg = '来自IP:{}端口:{}:\n{}\n'.format(address[0], address[1], msg)
                 self.signal_write_msg.emit(msg)
-                Constant.parse_receive(self.msg)
+                Constant.parse_receive(msg)
             else:
                 self.tcp_socket.close()
                 self.reset()
@@ -173,37 +195,52 @@ class TcpLogic(tcp_udp_web_ui.ToolsUi):
                 self.signal_write_msg.emit(msg)
                 break
 
-    def tcp_send(self, data=None, init_code = None):
+    def tcp_send(self, data=None, init_code=None):
+        arras = ''
         """
         功能函数，用于TCP服务端和TCP客户端发送消息
         :return: None
         """
-        send_msg = ""
+        send_msg = None
         if self.link is False:
             msg = '请选择服务，并点击连接网络\n'
             self.signal_write_msg.emit(msg)
         else:
             try:
-                if data == None:
+                if init_code is not None:
+                    send_msg = init_code
+                    print("-------------------需要的发送格式要求-----------------------")
+                    print(send_msg)
+                    print(type(send_msg))
+                elif data is None:
                     send_msg = (str(self.textEdit_send.toPlainText())).encode('utf-8')
                 else:
-                    send_msg = bytes(data, encoding="utf8")
+                    # send_msg = bytes(data, encoding="utf8")
+                    # print("--------------2数据的长度为：", len(data))
+                    if len(data) == 2065:
+                        arras = data[:2064] + '0' + data[-1]
+                        send_msg = codecs.decode(arras, 'hex_codec')
+                    else:
+                        send_msg = codecs.decode(data, 'hex_codec')
+                    # temp_send = b""
+                    # for i in send_msg:
+                    #     temp_send +=i
+                    # send_msg = temp_send
                 if self.comboBox_tcp.currentIndex() == 0:
                     # 向所有连接的客户端发送消息
-                    for client, address in self.client_socket_list:
-                            # if init_code == None:
-                            update = b'\xFF\xFF\x00\x27\x00\x00\x00\x00\x00\x00\x00\x00\x00\xEE\xEE\x28'
-                            print("===", client)
-                            print("===", address)
-                            print(update)
-                            client.send(update)
-                            # binascii.b2a_hex(send_msg)
-                            # print("----------", test)
-                            # client.send(send_msg)
+                    # for client, address in self.client_socket_list:
+                    # if init_code == None:
+                    # update = b'\xFF\xFF\x00\x27\x00\x00\x00\x00\x00\x00\x00\x00\x00\xEE\xEE\x28'
+                    if self.flag >1:
+                        print(send_msg)
+                    print("正在发送----------",self.flag)
+                    self.send_socket.send(send_msg)
+                    print("发送完成----------",self.flag)
                     msg = 'TCP服务端已发送\n'
                     self.signal_write_msg.emit(msg)
                 if self.comboBox_tcp.currentIndex() == 1:
-                    self.tcp_socket.send(send_msg)
+                    self.send_socket.send(send_msg)
+                    print("-----发送")
                     msg = 'TCP客户端已发送\n'
                     self.signal_write_msg.emit(msg)
             except Exception as ret:
@@ -266,12 +303,19 @@ class TcpLogic(tcp_udp_web_ui.ToolsUi):
         return checksum
 
     def read_bin(self, filename):
+        length = int(os.path.getsize(filename) / 1024 + 0.5)
         file = open(filename, 'rb')
         i = 0
         arr = []
         m = 0
+        # 初始结束命令
+        zero = Constant.get_finish0('a')
+        self.finish_all = self.get_str(zero)
         while 1:
-            if (i >= 1024):
+
+            if i >= 1024:
+                print(length)
+                print(m)
                 arr.insert(0, 'aa')
                 arr.insert(0, 'aa')
                 arr.insert(0, 'aa')
@@ -280,36 +324,43 @@ class TcpLogic(tcp_udp_web_ui.ToolsUi):
                 arr.append('ee')
                 arr.append('ee')
                 arr.append('ee')
-                result = Constant.checkout_custom_long(arr[4:1029])
-                # print("----------",result[2:4])
+                result = Constant.checkout_custom_long(arr[3:1029])
                 arr.append(result[2:4])
                 self.arrs.append(arr)
+                print(arr)
                 arr = []
-                i = 0
                 m = m + 1
-
-            c = file.read(1)
-            # 将字节转换成16进制；
-            ssss = str(binascii.b2a_hex(c))[2:-1]
-            if ssss == '':
+                i = 0
+            if m == length:
                 self.show_message()
                 break
+
+            c = file.read(1)
+
+            ssss = str(binascii.b2a_hex(c))[2:-1]
+            if ssss=='':
+                ssss = 'FF'
             arr.append(ssss)
             i += 1
 
-            # if not c:
-            #     break
-            # ser = serial.Serial('COM3', 57600, timeout=1)
-            # ser.write(bytes().fromhex(ssss))# 将16进制转换为字节
-            # if i % 16 == 0:
-            #     time.sleep(0.001)
-            # #写每一行等待的时间
-            #
-            i += 1
 
-            # ser.close()
 
+        self.total = m
         file.close()
+    def get_str(self,arrss):
+        arrss.insert(0, 'aa')
+        arrss.insert(0, 'aa')
+        arrss.insert(0, 'aa')
+        arrss.insert(3, '28')
+        arrss.insert(4, self.dec2hexstr(0))
+        arrss.append('ee')
+        arrss.append('ee')
+        arrss.append('ee')
+        result = Constant.checkout_custom_long(arrss[3:1029])
+        arrss.append(result[2:4])
+        print(arrss)
+        print("*"*50)
+        return arrss
 
 
 if __name__ == '__main__':
