@@ -27,7 +27,9 @@ class TcpLogic(tcp_udp_web_ui.ToolsUi):
         self.client_th = None
         self.flag = 0
         self.arrs = []
+        self.temm = 1
         self.client_socket_list = list()
+        self.client_socket_lists = list()
         self.link = False  # 用于标记是否开启了连接
         # 初始化的时候加载bin文件 存储在这个数组里面
 
@@ -77,16 +79,31 @@ class TcpLogic(tcp_udp_web_ui.ToolsUi):
             clientsock, clientaddress = self.tcp_socket.accept()
             print('connect from:', clientaddress)
             msg = "检测到 客户端 :" + str(clientaddress) + "已经连接\n"
+            self.set_port(clientaddress[1])
             self.signal_write_msg.emit(msg)
-            # self.client_socket_list.append((clientsock, clientaddress))
+            self.client_socket_list.append(clientaddress)
+            self.client_socket_lists.append((clientsock,clientaddress))
+            self.detect_is_alive()
             # 传输数据都利用clientsock，和s无关
             t = threading.Thread(target=self.tcplink, args=(clientsock, clientaddress))  # t为新创建的线程
             t.start()
+    def set_port(self,port):
+        '''
+        设置端口
+        '''
+        id = self.combox_port_select.count()
+        self.combox_port_select.insertItem(id, str(port))
+
 
     def tcplink(self, sock, addr):
         result = []
+        index = 0
         while True:
-            if addr[1] == 5000:
+            if self.combox_port_select.currentText()=="all connections":
+                index = 5000
+            else:
+                index = int(self.combox_port_select.currentText())
+            if addr[1] == index:
                 self.send_socket = sock
 
             recvdata = sock.recv(2048)
@@ -108,7 +125,28 @@ class TcpLogic(tcp_udp_web_ui.ToolsUi):
             # clientsock.send(b' ')
         sock.close()
         self.send_socket = None
+    def detect_is_alive(self):
+        current = self.combox_port_select.currentText()
+        temp = []
+        temp_1 = []
+        temp_num = []
+        self.combox_port_select.clear()
+        self.combox_port_select.insertItem(0, "all connections")
+        for client, address in self.client_socket_lists:
 
+            try:
+                print("连接状态")
+                temp.append((client, address))
+                temp_1.append(address)
+                temp_num.append(address[1])
+            except:
+                self.combox_port_select.clearEditText()
+        self.client_socket_lists = []
+        self.client_socket_lists = list(set(temp))
+        temp_num = list(set(temp_num))
+        for strss in temp_num:
+            self.combox_port_select.insertItem(1, str(strss))
+        self.combox_port_select.setCurrentText(current)
     def parse_code(self, code, res):
         if code == 12:
             # if self.flag >= self.total:
@@ -123,6 +161,7 @@ class TcpLogic(tcp_udp_web_ui.ToolsUi):
             #     self.tcp_send(data=str(Constant.finish))
         elif code == 14:
             print("-------------", self.flag, "-------", self.total)
+            self.progressBar.setValue((100 / 35) * self.flag)
             if self.flag >=self.total:
                 self.signal_write_msg.emit("【结束包正在发送......】\n")
                 print("结束包正在发送---------\n")
@@ -152,6 +191,7 @@ class TcpLogic(tcp_udp_web_ui.ToolsUi):
             print("-------------------其他异常")
             print(code)
             self.signal_write_msg.emit(self.show_message_error(code))
+
 
     def tcp_client_start(self):
         """
@@ -203,6 +243,12 @@ class TcpLogic(tcp_udp_web_ui.ToolsUi):
         self.flag = 0
         self.total = None
         self.signal_write_msg.emit("【恭喜您,数据已重置】\n")
+        self.progressBar.setValue(0)
+        temp =self.combox_port_select.currentText()
+        self.combox_port_select.clear()
+        self.combox_port_select.insertItem(0,temp)
+
+
 
     def tcp_send(self, data=None, init_code=None):
         arras = ''
@@ -263,12 +309,15 @@ class TcpLogic(tcp_udp_web_ui.ToolsUi):
         """
         if self.comboBox_tcp.currentIndex() == 0:
             try:
-                for client, address in self.client_socket_list:
+
+                for client, address in self.client_socket_lists:
                     client.close()
                 self.tcp_socket.close()
                 if self.link is True:
                     msg = '已断开网络\n'
                     self.signal_write_msg.emit(msg)
+                self.combox_port_select.clear()
+                self.combox_port_select.insertItem(0, "all connections")
             except Exception as ret:
                 pass
         if self.comboBox_tcp.currentIndex() == 1:

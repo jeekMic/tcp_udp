@@ -47,12 +47,22 @@ class ToolsUi(QDialog):
         self.textEdit_send = QtWidgets.QTextEdit()
         self.textBrowser_recv = QtWidgets.QTextBrowser()
         self.comboBox_tcp = QtWidgets.QComboBox()
+        self.progressBar = QtWidgets.QProgressBar()
+        self.progressBar.setGeometry(QtCore.QRect())
+        self.progressBar.setProperty("value", 0)
+        self.progressBar.setObjectName("progressBar")
+        self.label_port_select = QtWidgets.QLabel()
+        self.label_port_select.setText("  端口选择:")
+        self.combox_port_select = QtWidgets.QComboBox()
+        self.combox_port_select.setMaxVisibleItems(5)
+        self.combox_port_select.setMaxCount(10)
 
         # 定义布局
         self.h_box_1 = QHBoxLayout()
         self.h_box_2 = QHBoxLayout()
         self.h_box_3 = QHBoxLayout()
         self.h_box_4 = QHBoxLayout()
+        self.h_box_5 = QHBoxLayout()
         self.h_box_recv = QHBoxLayout()
         self.h_box_exit = QHBoxLayout()
         self.h_box_all = QHBoxLayout()
@@ -69,6 +79,7 @@ class ToolsUi(QDialog):
         self.comboBox_tcp.addItem("")
         self.comboBox_tcp.addItem("")
         self.comboBox_tcp.addItem("")
+        self.combox_port_select.insertItem(0, "all connections")
         # self.comboBox_tcp.addItem("")
 
         # 设置字体
@@ -148,7 +159,13 @@ class ToolsUi(QDialog):
         self.v_box_set.addLayout(self.h_box_4)
         self.v_box_web.addWidget(self.label_dir)
         self.v_box_web.addWidget(self.pushButton_dir)
-        self.v_box_send.addWidget(self.label_send)
+        # self.v_box_send.addWidget(self.label_send)
+        self.h_box_5.addWidget(self.label_send)
+
+        self.h_box_5.addWidget(self.label_port_select)
+        self.h_box_5.addWidget(self.combox_port_select)
+
+        self.v_box_send.addLayout(self.h_box_5)
         self.v_box_send.addWidget(self.textEdit_send)
         self.v_box_send.addLayout(self.v_box_web)
         self.v_box_exit.addWidget(self.pushButton_send)
@@ -165,7 +182,9 @@ class ToolsUi(QDialog):
         self.h_box_recv.addWidget(self.label_rev)
         self.h_box_recv.addWidget(self.pushButton_clear)
         self.v_box_right.addLayout(self.h_box_recv)
+
         self.v_box_right.addWidget(self.textBrowser_recv)
+        self.v_box_right.addWidget(self.progressBar)
 
         # 将左右布局添加到窗体布局
         self.h_box_all.addLayout(self.v_box_left)

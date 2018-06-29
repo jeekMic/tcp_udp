@@ -2,15 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="5e4623bf-3abb-455f-8d93-289e15600a79" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/setup.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/shared.ico" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tcp_logic.py" beforeDir="false" afterPath="$PROJECT_DIR$/tcp_logic.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tcp_udp_web_tools_all_in_one.py" beforeDir="false" afterPath="$PROJECT_DIR$/tcp_udp_web_tools_all_in_one.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tcp_udp_web_tools_all_in_one.py___jb_tmp___" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/tcp_udp_web_ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/tcp_udp_web_ui.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test2.py" beforeDir="false" afterPath="$PROJECT_DIR$/test2.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -24,8 +17,8 @@
       <file leaf-file-name="main.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="184">
-              <caret line="111" column="23" selection-start-line="111" selection-start-column="23" selection-end-line="111" selection-end-column="23" />
+            <state relative-caret-position="495">
+              <caret line="173" column="11" selection-start-line="173" selection-start-column="11" selection-end-line="173" selection-end-column="11" />
               <folding>
                 <element signature="e#0#35#0" expanded="true" />
               </folding>
@@ -45,8 +38,8 @@
       <file leaf-file-name="constant.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/constant.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="231">
-              <caret line="97" column="8" selection-start-line="97" selection-start-column="8" selection-end-line="97" selection-end-column="8" />
+            <state relative-caret-position="126">
+              <caret line="96" column="6" selection-start-line="96" selection-start-column="6" selection-end-line="96" selection-end-column="6" />
             </state>
           </provider>
         </entry>
@@ -54,8 +47,8 @@
       <file leaf-file-name="tcp_udp_web_ui.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/tcp_udp_web_ui.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-1738">
-              <caret line="151" column="39" lean-forward="true" selection-start-line="151" selection-start-column="39" selection-end-line="151" selection-end-column="39" />
+            <state relative-caret-position="235">
+              <caret line="55" column="53" selection-start-line="55" selection-start-column="44" selection-end-line="55" selection-end-column="53" />
               <folding>
                 <element signature="e#0#42#0" expanded="true" />
               </folding>
@@ -75,8 +68,8 @@
       <file leaf-file-name="tcp_logic.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/tcp_logic.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="319">
-              <caret line="215" column="34" selection-start-line="215" selection-start-column="34" selection-end-line="215" selection-end-column="34" />
+            <state relative-caret-position="467">
+              <caret line="141" column="19" lean-forward="true" selection-start-line="141" selection-start-column="19" selection-end-line="141" selection-end-column="19" />
               <folding>
                 <element signature="e#0#13#0" expanded="true" />
               </folding>
@@ -84,11 +77,25 @@
           </provider>
         </entry>
       </file>
+      <file leaf-file-name="QComboBox.py" pinned="false" current-in-tab="false">
+        <entry file="file://$USER_HOME$/.PyCharmCE2018.1/system/python_stubs/-313451744/PyQt5/QtWidgets/QComboBox.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="202">
+              <caret line="47" column="8" selection-start-line="47" selection-start-column="8" selection-end-line="47" selection-end-column="8" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="shared.ico" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/shared.ico">
+          <provider selected="true" editor-type-id="images" />
+        </entry>
+      </file>
       <file leaf-file-name="setup.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/setup.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="261">
-              <caret line="9" column="27" lean-forward="true" selection-start-line="9" selection-start-column="27" selection-end-line="9" selection-end-column="27" />
+              <caret line="9" column="27" selection-start-line="9" selection-start-column="27" selection-end-line="9" selection-end-column="27" />
               <folding>
                 <element signature="e#0#10#0" expanded="true" />
               </folding>
@@ -107,17 +114,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>b8</find>
-      <find>''</find>
-      <find>check</find>
-      <find>finish</find>
-      <find>发送</find>
-      <find>bin</find>
-      <find>发送失败</find>
-      <find>擦除</find>
-      <find>finish_all</find>
-      <find>parse_receive</find>
-      <find>message</find>
       <find>signal_send_msg</find>
       <find>其他</find>
       <find>emit</find>
@@ -127,7 +123,6 @@
       <find>pushButton_get_ip</find>
       <find>show</find>
       <find>云台</find>
-      <find>signal_write_msg</find>
       <find>开始</find>
       <find>pushButton_exit</find>
       <find>reset</find>
@@ -136,7 +131,19 @@
       <find>是否</find>
       <find>确认</find>
       <find>label_written</find>
+      <find>窗口</find>
+      <find>pushButton_else</find>
+      <find>print</find>
+      <find>signal_write_msg</find>
       <find>重置</find>
+      <find>textBrowser_recv</find>
+      <find>comboBox_tcp</find>
+      <find>label_send</find>
+      <find>v_box_send</find>
+      <find>5000</find>
+      <find>client_socket_list</find>
+      <find>progre</find>
+      <find>label_port_select</find>
     </findStrings>
     <dirStrings>
       <dir>D:\test99\tcp_udp_web_tools-pyqt5-master</dir>
@@ -155,19 +162,19 @@
         <option value="$PROJECT_DIR$/test3.py" />
         <option value="$PROJECT_DIR$/readDate.py___jb_tmp___" />
         <option value="$PROJECT_DIR$/test4.py" />
-        <option value="$PROJECT_DIR$/constant.py" />
         <option value="$PROJECT_DIR$/setup.py" />
         <option value="$PROJECT_DIR$/test2.py" />
         <option value="$PROJECT_DIR$/tcp_udp_web_tools_all_in_one.py" />
-        <option value="$PROJECT_DIR$/tcp_udp_web_ui.py" />
         <option value="$PROJECT_DIR$/main.py" />
+        <option value="$PROJECT_DIR$/constant.py" />
+        <option value="$PROJECT_DIR$/tcp_udp_web_ui.py" />
         <option value="$PROJECT_DIR$/tcp_logic.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="565" />
-    <option name="y" value="38" />
+    <option name="x" value="1" />
+    <option name="y" value="76" />
     <option name="width" value="1362" />
     <option name="height" value="949" />
   </component>
@@ -342,7 +349,7 @@
       <window_info anchor="bottom" id="Find" order="1" weight="0.3281075" />
       <window_info anchor="bottom" id="Version Control" order="7" weight="0.32922733" />
       <window_info anchor="bottom" id="Python Console" order="7" weight="0.32922733" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.29227322" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.12094065" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Terminal" order="7" weight="0.34602463" />
       <window_info id="Favorites" order="2" side_tool="true" />
@@ -367,27 +374,10 @@
           </properties>
         </breakpoint>
       </default-breakpoints>
-      <option name="time" value="61" />
+      <option name="time" value="66" />
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/constant.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1595">
-          <caret line="55" lean-forward="true" selection-start-line="55" selection-end-line="55" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/tcp_udp_web_ui.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3625">
-          <caret line="128" column="53" selection-start-line="128" selection-start-column="36" selection-end-line="128" selection-end-column="53" />
-          <folding>
-            <element signature="e#0#42#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/test.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1682">
@@ -676,13 +666,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/constant.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="231">
-          <caret line="97" column="8" selection-start-line="97" selection-start-column="8" selection-end-line="97" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://C:/ProgramData/Anaconda3/Lib/re.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="186">
@@ -711,16 +694,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/setup.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="261">
-          <caret line="9" column="27" lean-forward="true" selection-start-line="9" selection-start-column="27" selection-end-line="9" selection-end-column="27" />
-          <folding>
-            <element signature="e#0#10#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/tcp_udp_web_tools_all_in_one.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="445">
@@ -728,30 +701,57 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/tcp_udp_web_ui.py">
+    <entry file="file://$PROJECT_DIR$/shared.ico">
+      <provider selected="true" editor-type-id="images" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/setup.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1738">
-          <caret line="151" column="39" lean-forward="true" selection-start-line="151" selection-start-column="39" selection-end-line="151" selection-end-column="39" />
+        <state relative-caret-position="261">
+          <caret line="9" column="27" selection-start-line="9" selection-start-column="27" selection-end-line="9" selection-end-column="27" />
           <folding>
-            <element signature="e#0#42#0" expanded="true" />
+            <element signature="e#0#10#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/constant.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="126">
+          <caret line="96" column="6" selection-start-line="96" selection-start-column="6" selection-end-line="96" selection-end-column="6" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="184">
-          <caret line="111" column="23" selection-start-line="111" selection-start-column="23" selection-end-line="111" selection-end-column="23" />
+        <state relative-caret-position="495">
+          <caret line="173" column="11" selection-start-line="173" selection-start-column="11" selection-end-line="173" selection-end-column="11" />
           <folding>
             <element signature="e#0#35#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$USER_HOME$/.PyCharmCE2018.1/system/python_stubs/-313451744/PyQt5/QtWidgets/QComboBox.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="202">
+          <caret line="47" column="8" selection-start-line="47" selection-start-column="8" selection-end-line="47" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tcp_udp_web_ui.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="235">
+          <caret line="55" column="53" selection-start-line="55" selection-start-column="44" selection-end-line="55" selection-end-column="53" />
+          <folding>
+            <element signature="e#0#42#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/tcp_logic.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="319">
-          <caret line="215" column="34" selection-start-line="215" selection-start-column="34" selection-end-line="215" selection-end-column="34" />
+        <state relative-caret-position="467">
+          <caret line="141" column="19" lean-forward="true" selection-start-line="141" selection-start-column="19" selection-end-line="141" selection-end-column="19" />
           <folding>
             <element signature="e#0#13#0" expanded="true" />
           </folding>
