@@ -86,7 +86,6 @@ class TcpLogic(tcp_udp_web_ui.ToolsUi):
     def tcplink(self, sock, addr):
         result = []
         while True:
-            print("------1")
             if addr[1] == 5000:
                 self.send_socket = sock
 
@@ -96,6 +95,9 @@ class TcpLogic(tcp_udp_web_ui.ToolsUi):
                 result.append(hex(i))
             if len(result) < 5:
                 return
+            self.signal_send_msg.emit(str(result)+"\n")
+            self.signal_send_msg.emit("----------------------")
+
             code, res = Constant.parse_receive(result)
             msg = '来自IP:{}端口:{}:\n{}\n{}'.format(addr[0], addr[1], recvdata, res)
             self.signal_write_msg.emit(msg)
@@ -122,11 +124,11 @@ class TcpLogic(tcp_udp_web_ui.ToolsUi):
         elif code == 14:
             print("-------------", self.flag, "-------", self.total)
             if self.flag >=self.total:
-                self.signal_write_msg.emit("结束包正在发送---------\n")
+                self.signal_write_msg.emit("【结束包正在发送......】\n")
                 print("结束包正在发送---------\n")
                 print(''.join(self.finish_all))
                 self.tcp_send(data=''.join(self.finish_all))
-                self.signal_write_msg.emit("结束包发送成功---------\n")
+                self.signal_write_msg.emit("【结束包发送成功---------】\n")
                 print("结束包发送成功---------\n")
                 return
 
@@ -138,14 +140,14 @@ class TcpLogic(tcp_udp_web_ui.ToolsUi):
             #     # 所有的包发送完毕并且成功发送需要发送一条告诉设备已经发送完毕的指令
             #     self.tcp_send(data = str(Constant.finish))
         elif code == 13:
-            self.signal_write_msg.emit("第%d位数据包发送错误,正在重新发送....\n" % (res + 1))
+            self.signal_write_msg.emit("【第%d位数据包发送错误,正在重新发送....】\n" % (res + 1))
             self.tcp_send(data=' '.join(self.arrs[res]))
             # 数据包错误，并且第八位为错误的包序号,需要重复的包号
-            self.signal_write_msg.emit("数据包已经重新发送\n")
+            self.signal_write_msg.emit("【数据包已经重新发送】\n")
         elif code == 33:
-            self.signal_write_msg.emit('write is failed\n')
+            self.signal_write_msg.emit('【写入错误】\n')
         elif code == 15:
-            self.signal_write_msg.emit('update is failed\n')
+            self.signal_write_msg.emit('【更新失败】\n')
         else:
             print("-------------------其他异常")
             print(code)
@@ -173,7 +175,7 @@ class TcpLogic(tcp_udp_web_ui.ToolsUi):
             else:
                 self.client_th = threading.Thread(target=self.tcp_client_concurrency, args=(address,))
                 self.client_th.start()
-                msg = 'TCP客户端已连接IP:%s端口:%s\n' % address
+                msg = '【TCP客户端已连接IP:%s端口:%s】\n' % address
                 self.signal_write_msg.emit(msg)
 
     def tcp_client_concurrency(self, address):
@@ -185,15 +187,22 @@ class TcpLogic(tcp_udp_web_ui.ToolsUi):
             recv_msg = self.tcp_socket.recv(1024)
             if recv_msg:
                 msg = recv_msg.decode('utf-8')
-                msg = '来自IP:{}端口:{}:\n{}\n'.format(address[0], address[1], msg)
+                msg = '【来自IP:{}端口:{}:】\n'.format(address[0], address[1])
                 self.signal_write_msg.emit(msg)
                 Constant.parse_receive(msg)
             else:
                 self.tcp_socket.close()
                 self.reset()
-                msg = '从服务器断开连接\n'
+                msg = '【从服务器断开连接】\n'
                 self.signal_write_msg.emit(msg)
                 break
+    #重置界面上的数据文件,重新加载文件
+    def reset_data(self):
+        self.arrs=[]
+        self.finish_all=None
+        self.flag = 0
+        self.total = None
+        self.signal_write_msg.emit("【恭喜您,数据已重置】\n")
 
     def tcp_send(self, data=None, init_code=None):
         arras = ''
@@ -203,7 +212,7 @@ class TcpLogic(tcp_udp_web_ui.ToolsUi):
         """
         send_msg = None
         if self.link is False:
-            msg = '请选择服务，并点击连接网络\n'
+            msg = '【请选择服务，并点击连接网络】\n'
             self.signal_write_msg.emit(msg)
         else:
             try:

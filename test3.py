@@ -9,12 +9,9 @@ s.listen(10)     #最大连接数
 
 def tcplink(sock,addr):
     while True:
-        print("------1")
         recvdata=clientsock.recv(buffsize)
-        print("------2")
         if recvdata=='exit' or not recvdata:
             break
-        print("------3")
         clientsock.send(b' ')
     clientsock.close()
 

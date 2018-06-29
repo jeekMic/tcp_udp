@@ -7,7 +7,8 @@ import sys
 class ToolsUi(QDialog):
     # 信号槽机制：设置一个信号，用于触发接收区写入动作
     signal_write_msg = QtCore.pyqtSignal(str)
-
+    # 信号槽进制:设置一个信号,用于触发发送区的写入动作
+    signal_send_msg = QtCore.pyqtSignal(str)
 
     def __init__(self, num):
         """
@@ -32,6 +33,7 @@ class ToolsUi(QDialog):
         self.pushButton_send = QtWidgets.QPushButton()
         self.pushButton_dir = QtWidgets.QPushButton()
         self.pushButton_else = QtWidgets.QPushButton()
+        self.pushButton_reset_all = QtWidgets.QPushButton()
         self.label_port = QtWidgets.QLabel()
         self.label_ip = QtWidgets.QLabel()
         self.label_rev = QtWidgets.QLabel()
@@ -58,6 +60,7 @@ class ToolsUi(QDialog):
         self.v_box_send = QVBoxLayout()
         self.v_box_web = QVBoxLayout()
         self.v_box_exit = QVBoxLayout()
+        self.v_box_bootom_left = QVBoxLayout()
         self.v_box_right = QVBoxLayout()
         self.v_box_left = QVBoxLayout()
 
@@ -99,26 +102,29 @@ class ToolsUi(QDialog):
                                 QMessageBox.Yes)
     def show_message_error(self, error_id):
         message = "未知异常"
-        if error_id == 32:
-            message = "擦除备份区失败"
-            pass
-        elif error_id ==37:
-            message = "备份失败"
-            pass
-        elif error_id == 30:
-            message = "擦除源码区失败"
-            pass
-        elif error_id == 36:
-            message = "更新区代码复制到源码区失败"
-        elif error_id == 38:
-            message = "恢复失败,错误代码38"
-            pass
-        elif error_id == 31:
-            message = "擦除失败31"
-        elif error_id == 35:
-            message = "恭喜您! 程序执行完毕！设备更新正常"
-            pass
-        return message
+        try:
+            if error_id == 32:
+                message = "擦除备份区失败"
+                pass
+            elif error_id ==37:
+                message = "备份失败"
+                pass
+            elif error_id == 30:
+                message = "擦除源码区失败"
+                pass
+            elif error_id == 36:
+                message = "更新区代码复制到源码区失败"
+            elif error_id == 38:
+                message = "恢复失败,错误代码38"
+                pass
+            elif error_id == 31:
+                message = "擦除失败31"
+            elif error_id == 35:
+                message = "恭喜您! 程序执行完毕！设备更新正常"
+                pass
+            return message
+        except:
+            return "储蓄出现异常"
     def layout_ui(self):
         """
         设置控件的布局
@@ -147,7 +153,9 @@ class ToolsUi(QDialog):
         self.v_box_send.addLayout(self.v_box_web)
         self.v_box_exit.addWidget(self.pushButton_send)
         self.v_box_exit.addWidget(self.pushButton_exit)
-        self.h_box_exit.addWidget(self.label_written)
+        self.v_box_bootom_left.addWidget(self.pushButton_reset_all)
+        self.v_box_bootom_left.addWidget(self.label_written)
+        self.h_box_exit.addLayout(self.v_box_bootom_left)
         self.h_box_exit.addLayout(self.v_box_exit)
         self.v_box_left.addLayout(self.v_box_set)
         self.v_box_left.addLayout(self.v_box_send)
@@ -187,7 +195,7 @@ class ToolsUi(QDialog):
         self.pushButton_send.setText(self._translate("TCP-UDP", "发送"))
         self.pushButton_exit.setText(self._translate("TCP-UDP", "退出系统"))
         self.pushButton_dir.setText(self._translate("TCP-UDP", "选择路径"))
-        self.pushButton_else.setText(self._translate("TCP-UDP", "窗口多开another"))
+        self.pushButton_else.setText(self._translate("TCP-UDP", "窗口多开"))
         self.label_ip.setText(self._translate("TCP-UDP", "本机IP:"))
         self.label_port.setText(self._translate("TCP-UDP", "端口号:"))
         self.label_sendto.setText(self._translate("TCP-UDP", "目标IP:"))
@@ -195,6 +203,7 @@ class ToolsUi(QDialog):
         self.label_send.setText(self._translate("TCP-UDP", "发送区域"))
         self.label_dir.setText(self._translate("TCP-UDP", "请选择index.html所在的文件夹"))
         self.label_written.setText(self._translate("TCP-UDP", "加载文件"))
+        self.pushButton_reset_all.setText(self._translate("TCP-UDP", "重置"))
 
     def connect(self):
         """
@@ -203,6 +212,7 @@ class ToolsUi(QDialog):
         :return: None
         """
         self.signal_write_msg.connect(self.write_msg)
+        self.signal_send_msg.connect(self.send_msg)
         self.comboBox_tcp.currentIndexChanged.connect(self.combobox_change)
 
     def combobox_change(self):
@@ -251,6 +261,12 @@ class ToolsUi(QDialog):
         self.textBrowser_recv.insertPlainText(msg)
         # 滚动条移动到结尾
         self.textBrowser_recv.moveCursor(QtGui.QTextCursor.End)
+    def send_msg(self,send_msg):
+        '''
+        功能函数,上位机在通过网口发送数据的时候将数据呈现在界面上
+        :return:
+        '''
+        self.textEdit_send.insertPlainText(send_msg)
 
     def closeEvent(self, event):
         """

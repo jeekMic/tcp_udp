@@ -238,6 +238,7 @@ class Ui_TCP(QDialog):
         self.pushButton_exit.clicked.connect(self.close)
         self.pushButton_else.clicked.connect(self.another_window)
 
+
     def combobox_change(self):
         """
         combobox控件内容改变时触发的槽

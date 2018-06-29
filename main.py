@@ -48,6 +48,9 @@ class MainWindow(tcp_logic.TcpLogic, udp_logic.UdpLogic, web_logic.WebLogic):
         self.pushButton_exit.clicked.connect(self.close)
         self.pushButton_else.clicked.connect(self.another_window)
         self.label_written.clicked.connect(self.load_file)
+        self.pushButton_reset_all.clicked.connect(self.show_confirm_message)
+
+
 
     def load_file(self):
         print("加载文件")
@@ -109,7 +112,12 @@ class MainWindow(tcp_logic.TcpLogic, udp_logic.UdpLogic, web_logic.WebLogic):
             self.tcp_send(init_code=Constant.update)
         else:
             pass
-
+    def show_confirm_message(self):
+        reply = QMessageBox.question(self, '提示', "是否重置", QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        if reply == QMessageBox.Yes:
+            self.reset_data()
+        else:
+            pass
     def send(self):
         """
         pushbutton_send控件点击触发的槽
@@ -167,13 +175,13 @@ class MainWindow(tcp_logic.TcpLogic, udp_logic.UdpLogic, web_logic.WebLogic):
         # 弹出一个消息框，提示开启了一个新的窗口
         QtWidgets.QMessageBox.warning(self,
                                       'TCP/UDP云台助手',
-                                      "已经开启了新的TCP/UDP云台助手！",
+                                      "已经禁止多窗口模式,有需要请与标哥联系",
                                       QtWidgets.QMessageBox.Yes)
-        # 计数，开启了几个窗口
-        self.num = self.num + 1
-        # 开启新的窗口
-        self.another = MainWindow(self.num)
-        self.another.show()
+        # # 计数，开启了几个窗口
+        # self.num = self.num + 1
+        # # 开启新的窗口
+        # self.another = MainWindow(self.num)
+        # self.another.show()
 
 
 if __name__ == '__main__':

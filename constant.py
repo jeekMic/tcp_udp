@@ -96,13 +96,12 @@ class Constant(object):
 
     # 用于解析来自客户端的命令
     def parse_receive(data):
-        print("-----------接收的数据----------------")
+        print("-----------正在接收的数据----------------")
         print(data)
         try:
             arr1 = data[12]
             arr2 = data[4]
 
-            print("-------------------------------------------------------------",arr1)
             if arr1 == '0x12':
                 return 12, "准备更新完毕"
             elif arr1 == '0x13':
