@@ -26,6 +26,7 @@ class MainWindow(tcp_logic.TcpLogic, udp_logic.UdpLogic, web_logic.WebLogic):
 
 
 
+
     def get_ip(self):
         self.lineEdit_ip_local.clear()
         my_addr = socket.gethostbyname(socket.gethostname())
@@ -112,6 +113,13 @@ class MainWindow(tcp_logic.TcpLogic, udp_logic.UdpLogic, web_logic.WebLogic):
             self.tcp_send(init_code=Constant.update)
         else:
             pass
+    def select_file(self):
+        reply = QMessageBox.question(self, '提示', '请选择bin文件之后进行操作,以免不必要的异常', QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        if reply == QMessageBox.Yes:
+            self.load_file()
+        else:
+            pass
+
     def show_confirm_message(self):
         reply = QMessageBox.question(self, '提示', "是否重置", QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if reply == QMessageBox.Yes:

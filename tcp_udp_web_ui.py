@@ -51,6 +51,11 @@ class ToolsUi(QDialog):
         self.progressBar.setGeometry(QtCore.QRect())
         self.progressBar.setProperty("value", 0)
         self.progressBar.setObjectName("progressBar")
+        # 从备份区恢复和从更新区恢复
+        self.combobox_backup = QtWidgets.QComboBox()
+        self.pushButton_backup = QtWidgets.QPushButton()
+        self.pushButton_restart_remote = QtWidgets.QPushButton()
+
         self.label_port_select = QtWidgets.QLabel()
         self.label_port_select.setText("  端口选择:")
         self.combox_port_select = QtWidgets.QComboBox()
@@ -63,6 +68,7 @@ class ToolsUi(QDialog):
         self.h_box_3 = QHBoxLayout()
         self.h_box_4 = QHBoxLayout()
         self.h_box_5 = QHBoxLayout()
+        self.h_box_6 = QHBoxLayout()
         self.h_box_recv = QHBoxLayout()
         self.h_box_exit = QHBoxLayout()
         self.h_box_all = QHBoxLayout()
@@ -79,6 +85,12 @@ class ToolsUi(QDialog):
         self.comboBox_tcp.addItem("")
         self.comboBox_tcp.addItem("")
         self.comboBox_tcp.addItem("")
+        self.combobox_backup.addItem("")
+        self.combobox_backup.addItem("")
+        self.combobox_backup.setDisabled(True)
+        self.pushButton_backup.setDisabled(True)
+        self.pushButton_restart_remote.setDisabled(True)
+
         self.combox_port_select.insertItem(0, "all connections")
         # self.comboBox_tcp.addItem("")
 
@@ -101,7 +113,8 @@ class ToolsUi(QDialog):
         self.lineEdit_ip_send.hide()
         self.label_dir.setWordWrap(True)  # 让label自动换行
         self.pushButton_unlink.setEnabled(False)
-        self.textBrowser_recv.insertPlainText("这是窗口-%s\n" % self.num)
+        self.textBrowser_recv.insertPlainText("提示:【请先加载bin文件,以免引起不必要的异常】\n")
+        self.textBrowser_recv.insertPlainText("\n")
         self.lineEdit_port.setText(str(6000))
         # 调用布局方法和控件显示文字的方法
         self.layout_ui()
@@ -110,6 +123,9 @@ class ToolsUi(QDialog):
 
     def show_message(self):
         QMessageBox.information(self, "提示", "文件加载成功",
+                                QMessageBox.Yes)
+    def show_error_for_loadfile(self):
+        QMessageBox.information(self, "提示", "大哥,你没有加载文件",
                                 QMessageBox.Yes)
     def show_message_error(self, error_id):
         message = "未知异常"
@@ -164,7 +180,9 @@ class ToolsUi(QDialog):
 
         self.h_box_5.addWidget(self.label_port_select)
         self.h_box_5.addWidget(self.combox_port_select)
-
+        self.h_box_6.addWidget(self.combobox_backup)
+        self.h_box_6.addWidget(self.pushButton_backup)
+        self.h_box_6.addWidget(self.pushButton_restart_remote)
         self.v_box_send.addLayout(self.h_box_5)
         self.v_box_send.addWidget(self.textEdit_send)
         self.v_box_send.addLayout(self.v_box_web)
@@ -185,6 +203,7 @@ class ToolsUi(QDialog):
 
         self.v_box_right.addWidget(self.textBrowser_recv)
         self.v_box_right.addWidget(self.progressBar)
+        self.v_box_right.addLayout(self.h_box_6)
 
         # 将左右布局添加到窗体布局
         self.h_box_all.addLayout(self.v_box_left)
@@ -206,6 +225,9 @@ class ToolsUi(QDialog):
         self.comboBox_tcp.setItemText(1, self._translate("TCP-UDP", "TCP客户端"))
         self.comboBox_tcp.setItemText(2, self._translate("TCP-UDP", "UDP服务端"))
         self.comboBox_tcp.setItemText(3, self._translate("TCP-UDP", "UDP客户端"))
+        self.combobox_backup.setItemText(0, self._translate("TCP-UDP", "从更新区更新"))
+        self.combobox_backup.setItemText(1, self._translate("TCP-UDP", "从备份区更新"))
+        self.pushButton_restart_remote.setText( self._translate("TCP-UDP", "远程重启"))
         # self.comboBox_tcp.setItemText(4, self._translate("TCP-UDP", "WEB服务端"))
         self.pushButton_link.setText(self._translate("TCP-UDP", "连接网络"))
         self.pushButton_unlink.setText(self._translate("TCP-UDP", "断开网络"))
@@ -223,6 +245,7 @@ class ToolsUi(QDialog):
         self.label_dir.setText(self._translate("TCP-UDP", "请选择index.html所在的文件夹"))
         self.label_written.setText(self._translate("TCP-UDP", "加载文件"))
         self.pushButton_reset_all.setText(self._translate("TCP-UDP", "重置"))
+        self.pushButton_backup.setText(self._translate("TCP-UDP", "恢复"))
 
     def connect(self):
         """

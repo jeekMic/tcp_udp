@@ -31,7 +31,17 @@ class TcpLogic(tcp_udp_web_ui.ToolsUi):
         self.client_socket_list = list()
         self.client_socket_lists = list()
         self.link = False  # 用于标记是否开启了连接
+        self.limit = 0
+        self.need_packet_id = 0
+        self.pushButton_backup.clicked.connect(self.send_backup)
+        self.pushButton_restart_remote.clicked.connect(self.restart)
         # 初始化的时候加载bin文件 存储在这个数组里面
+
+    def restart(self):
+        self.tcp_send(init_code=Constant.remote_restart)
+
+    def send_backup(self):
+        self.tcp_send(init_code=self.backup())
 
     # 选择bin文件
     def getfiles(self):
@@ -50,6 +60,9 @@ class TcpLogic(tcp_udp_web_ui.ToolsUi):
 
     def tcp_server_start(self):
         print("-----开启服务器-----------")
+        if len(self.arrs)==0:
+            self.signal_write_msg.emit("【请加载bin文件,以免引起不必要的气场】\n")
+            self.signal_write_msg.emit("【请加载bin文件,以免引起不必要的气场】\n")
         """
         功能函数，TCP服务端开启的方法
         :return: None
@@ -79,27 +92,28 @@ class TcpLogic(tcp_udp_web_ui.ToolsUi):
             clientsock, clientaddress = self.tcp_socket.accept()
             print('connect from:', clientaddress)
             msg = "检测到 客户端 :" + str(clientaddress) + "已经连接\n"
+
             self.set_port(clientaddress[1])
             self.signal_write_msg.emit(msg)
             self.client_socket_list.append(clientaddress)
-            self.client_socket_lists.append((clientsock,clientaddress))
+            self.client_socket_lists.append((clientsock, clientaddress))
             self.detect_is_alive()
             # 传输数据都利用clientsock，和s无关
             t = threading.Thread(target=self.tcplink, args=(clientsock, clientaddress))  # t为新创建的线程
             t.start()
-    def set_port(self,port):
+
+    def set_port(self, port):
         '''
         设置端口
         '''
         id = self.combox_port_select.count()
         self.combox_port_select.insertItem(id, str(port))
 
-
     def tcplink(self, sock, addr):
         result = []
         index = 0
         while True:
-            if self.combox_port_select.currentText()=="all connections":
+            if self.combox_port_select.currentText() == "all connections":
                 index = 5000
             else:
                 index = int(self.combox_port_select.currentText())
@@ -112,7 +126,7 @@ class TcpLogic(tcp_udp_web_ui.ToolsUi):
                 result.append(hex(i))
             if len(result) < 5:
                 return
-            self.signal_send_msg.emit(str(result)+"\n")
+            self.signal_send_msg.emit(str(result) + "\n")
             self.signal_send_msg.emit("----------------------")
 
             code, res = Constant.parse_receive(result)
@@ -125,6 +139,7 @@ class TcpLogic(tcp_udp_web_ui.ToolsUi):
             # clientsock.send(b' ')
         sock.close()
         self.send_socket = None
+
     def detect_is_alive(self):
         current = self.combox_port_select.currentText()
         temp = []
@@ -147,6 +162,7 @@ class TcpLogic(tcp_udp_web_ui.ToolsUi):
         for strss in temp_num:
             self.combox_port_select.insertItem(1, str(strss))
         self.combox_port_select.setCurrentText(current)
+
     def parse_code(self, code, res):
         if code == 12:
             # if self.flag >= self.total:
@@ -162,7 +178,7 @@ class TcpLogic(tcp_udp_web_ui.ToolsUi):
         elif code == 14:
             print("-------------", self.flag, "-------", self.total)
             self.progressBar.setValue((100 / 35) * self.flag)
-            if self.flag >=self.total:
+            if self.flag >= self.total:
                 self.signal_write_msg.emit("【结束包正在发送......】\n")
                 print("结束包正在发送---------\n")
                 print(''.join(self.finish_all))
@@ -172,26 +188,47 @@ class TcpLogic(tcp_udp_web_ui.ToolsUi):
                 return
 
             self.tcp_send(data=''.join(self.arrs[self.flag]))
-            num_str = "已经发送数据包" + str(self.flag)+"\n"
+            num_str = "已经发送数据包" + str(self.flag) + "\n"
             self.signal_write_msg.emit(num_str)
             self.flag += 1
             # if self.flag == self.total:
             #     # 所有的包发送完毕并且成功发送需要发送一条告诉设备已经发送完毕的指令
             #     self.tcp_send(data = str(Constant.finish))
         elif code == 13:
-            self.signal_write_msg.emit("【第%d位数据包发送错误,正在重新发送....】\n" % (res + 1))
-            self.tcp_send(data=' '.join(self.arrs[res]))
-            # 数据包错误，并且第八位为错误的包序号,需要重复的包号
-            self.signal_write_msg.emit("【数据包已经重新发送】\n")
+            self.signal_write_msg.emit("【第%d包数据发送错误,正在重新发送....】\n" % (res + 1))
+            self.tcp_send(data=''.join(self.arrs[res]))
         elif code == 33:
             self.signal_write_msg.emit('【写入错误】\n')
+            # self.get_error(self.flag-1)
+        elif code == 39:
+            if res >= self.total-1:
+                self.signal_write_msg.emit("【远程程序发送命令错误，没有下一包数据可以发送了】")
+                return
+            if len(self.arrs) == 0:
+                self.signal_write_msg.emit("【请先加载文件】")
+                return
+            self.flag = res + 1
+            self.need_packet_id = self.flag
+
+            if self.limit > 5:
+                self.limit = 0
+                self.signal_write_msg.emit('【我已经尽力了,更新失败】\n')
+            else:
+                print("发送的包序号", self.flag)
+                self.tcp_send(data=''.join(self.arrs[self.flag]))
+            self.limit += 1
         elif code == 15:
             self.signal_write_msg.emit('【更新失败】\n')
+        elif code == 40:
+            self.signal_write_msg.emit('【app源代码损坏,软件更新失败,请重置数据,或者选择恢复方式恢复】\n')
+            self.set_visiable()
+        elif code == 41:
+            self.signal_write_msg.emit('【恢复成功】\n')
+            self.set_visiable(is_visiable=1)
         else:
             print("-------------------其他异常")
             print(code)
             self.signal_write_msg.emit(self.show_message_error(code))
-
 
     def tcp_client_start(self):
         """
@@ -218,6 +255,16 @@ class TcpLogic(tcp_udp_web_ui.ToolsUi):
                 msg = '【TCP客户端已连接IP:%s端口:%s】\n' % address
                 self.signal_write_msg.emit(msg)
 
+    def get_error(self, error_id):
+        if error_id < 100 and error_id > 0:
+            return "更新数据第{}包发送有误".format(error_id + 1)
+        if error_id == 0:
+            return "初始请求更新数据失败"
+        if error_id == 102:
+            return "结束命令发送有误"
+        if error_id >= self.total - 1:
+            return "结束包发送有误"
+
     def tcp_client_concurrency(self, address):
         """
         功能函数，用于TCP客户端创建子线程的方法，阻塞式接收
@@ -229,26 +276,24 @@ class TcpLogic(tcp_udp_web_ui.ToolsUi):
                 msg = recv_msg.decode('utf-8')
                 msg = '【来自IP:{}端口:{}:】\n'.format(address[0], address[1])
                 self.signal_write_msg.emit(msg)
-                Constant.parse_receive(msg)
             else:
                 self.tcp_socket.close()
                 self.reset()
                 msg = '【从服务器断开连接】\n'
                 self.signal_write_msg.emit(msg)
                 break
-    #重置界面上的数据文件,重新加载文件
+
+    # 重置界面上的数据文件,重新加载文件
     def reset_data(self):
-        self.arrs=[]
-        self.finish_all=None
+        self.arrs = []
+        self.finish_all = None
         self.flag = 0
         self.total = None
         self.signal_write_msg.emit("【恭喜您,数据已重置】\n")
         self.progressBar.setValue(0)
-        temp =self.combox_port_select.currentText()
+        temp = self.combox_port_select.currentText()
         self.combox_port_select.clear()
-        self.combox_port_select.insertItem(0,temp)
-
-
+        self.combox_port_select.insertItem(0, temp)
 
     def tcp_send(self, data=None, init_code=None):
         arras = ''
@@ -257,9 +302,13 @@ class TcpLogic(tcp_udp_web_ui.ToolsUi):
         :return: None
         """
         send_msg = None
+
         if self.link is False:
             msg = '【请选择服务，并点击连接网络】\n'
             self.signal_write_msg.emit(msg)
+        elif len(self.arrs) == 0:
+            self.signal_write_msg.emit("没有加载文件")
+            self.show_error_for_loadfile()
         else:
             try:
                 if init_code is not None:
@@ -281,16 +330,18 @@ class TcpLogic(tcp_udp_web_ui.ToolsUi):
                     # for i in send_msg:
                     #     temp_send +=i
                     # send_msg = temp_send
+                    print("--------------------发出的数据-----------------")
+                    print(send_msg)
                 if self.comboBox_tcp.currentIndex() == 0:
                     # 向所有连接的客户端发送消息
                     # for client, address in self.client_socket_list:
                     # if init_code == None:
                     # update = b'\xFF\xFF\x00\x27\x00\x00\x00\x00\x00\x00\x00\x00\x00\xEE\xEE\x28'
-                    if self.flag >1:
+                    if self.flag > 1:
                         print(send_msg)
-                    print("正在发送----------",self.flag)
+                    print("正在发送----------", self.flag)
                     self.send_socket.send(send_msg)
-                    print("发送完成----------",self.flag)
+                    print("发送完成----------", self.flag)
                     msg = 'TCP服务端已发送\n'
                     self.signal_write_msg.emit(msg)
                 if self.comboBox_tcp.currentIndex() == 1:
@@ -361,6 +412,7 @@ class TcpLogic(tcp_udp_web_ui.ToolsUi):
         return checksum
 
     def read_bin(self, filename):
+        self.reset_data()
         length = int(os.path.getsize(filename) / 1024 + 0.5)
         file = open(filename, 'rb')
         i = 0
@@ -396,16 +448,15 @@ class TcpLogic(tcp_udp_web_ui.ToolsUi):
             c = file.read(1)
 
             ssss = str(binascii.b2a_hex(c))[2:-1]
-            if ssss=='':
+            if ssss == '':
                 ssss = 'FF'
             arr.append(ssss)
             i += 1
 
-
-
         self.total = m
         file.close()
-    def get_str(self,arrss):
+
+    def get_str(self, arrss):
         arrss.insert(0, 'aa')
         arrss.insert(0, 'aa')
         arrss.insert(0, 'aa')
@@ -417,8 +468,38 @@ class TcpLogic(tcp_udp_web_ui.ToolsUi):
         result = Constant.checkout_custom_long(arrss[3:1029])
         arrss.append(result[2:4])
         print(arrss)
-        print("*"*50)
+        print("*" * 50)
         return arrss
+
+    def set_visiable(self, is_visiable=0):
+        if is_visiable == 0:
+            self.combobox_backup.setDisabled(False)
+            self.pushButton_backup.setDisabled(False)
+            self.pushButton_restart_remote.setDisabled(False)
+        else:
+            self.combobox_backup.setDisabled(True)
+            self.pushButton_backup.setDisabled(True)
+            self.pushButton_restart_remote.setDisabled(True)
+
+    # 3A当写入失败的时候开启是从更新区恢复还是从备份区恢复
+    def backup(self):
+        init_code = None
+        if self.combobox_backup.currentIndex() == 0:
+            print("从更新区恢复命令已经发送")
+            # 从更新区恢复
+            init_code = Constant.from_update_recover
+
+        elif self.combobox_backup.currentIndex() == 1:
+            print("从备份区恢复命令已经发送")
+            # 从备份区恢复
+            init_code = Constant.update_from_backup
+
+        else:
+            self.signal_write_msg.emit("【调试助手出现异常】")
+            return ""
+        # self.combobox_backup.setDisabled(False)
+        # self.pushButton_backup.setDisabled(False)
+        return init_code
 
 
 if __name__ == '__main__':
