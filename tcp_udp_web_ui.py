@@ -10,6 +10,9 @@ class ToolsUi(QDialog):
     # 信号槽进制:设置一个信号,用于触发发送区的写入动作
     signal_send_msg = QtCore.pyqtSignal(str)
 
+    # 信号槽进制:设置一个信号,用于触发进度条机制
+    signal_progress_msg = QtCore.pyqtSignal(int)
+
     def __init__(self, num):
         """
         初始化窗口
@@ -89,7 +92,7 @@ class ToolsUi(QDialog):
         self.combobox_backup.addItem("")
         self.combobox_backup.setDisabled(True)
         self.pushButton_backup.setDisabled(True)
-        self.pushButton_restart_remote.setDisabled(True)
+        self.pushButton_restart_remote.setDisabled(False)
 
         self.combox_port_select.insertItem(0, "all connections")
         # self.comboBox_tcp.addItem("")
@@ -124,16 +127,18 @@ class ToolsUi(QDialog):
     def show_message(self):
         QMessageBox.information(self, "提示", "文件加载成功",
                                 QMessageBox.Yes)
+
     def show_error_for_loadfile(self):
         QMessageBox.information(self, "提示", "大哥,你没有加载文件",
                                 QMessageBox.Yes)
+
     def show_message_error(self, error_id):
         message = "未知异常"
         try:
             if error_id == 32:
                 message = "擦除备份区失败"
                 pass
-            elif error_id ==37:
+            elif error_id == 37:
                 message = "备份失败"
                 pass
             elif error_id == 30:
@@ -152,6 +157,7 @@ class ToolsUi(QDialog):
             return message
         except:
             return "储蓄出现异常"
+
     def layout_ui(self):
         """
         设置控件的布局
@@ -227,7 +233,7 @@ class ToolsUi(QDialog):
         self.comboBox_tcp.setItemText(3, self._translate("TCP-UDP", "UDP客户端"))
         self.combobox_backup.setItemText(0, self._translate("TCP-UDP", "从更新区更新"))
         self.combobox_backup.setItemText(1, self._translate("TCP-UDP", "从备份区更新"))
-        self.pushButton_restart_remote.setText( self._translate("TCP-UDP", "远程重启"))
+        self.pushButton_restart_remote.setText(self._translate("TCP-UDP", "远程重启"))
         # self.comboBox_tcp.setItemText(4, self._translate("TCP-UDP", "WEB服务端"))
         self.pushButton_link.setText(self._translate("TCP-UDP", "连接网络"))
         self.pushButton_unlink.setText(self._translate("TCP-UDP", "断开网络"))
@@ -256,6 +262,10 @@ class ToolsUi(QDialog):
         self.signal_write_msg.connect(self.write_msg)
         self.signal_send_msg.connect(self.send_msg)
         self.comboBox_tcp.currentIndexChanged.connect(self.combobox_change)
+        self.signal_progress_msg.connect(self.change_progress)
+
+    def change_progress(self, int_pro):
+        self.progressBar.setValue(int_pro)
 
     def combobox_change(self):
         # 此函数用于选择不同功能时界面会作出相应变化
@@ -291,7 +301,6 @@ class ToolsUi(QDialog):
             self.textEdit_send.hide()
             self.label_port.setText(self._translate("TCP-UDP", "端口号:"))
 
-
     def write_msg(self, msg):
         # signal_write_msg信号会触发这个函数
         """
@@ -303,7 +312,8 @@ class ToolsUi(QDialog):
         self.textBrowser_recv.insertPlainText(msg)
         # 滚动条移动到结尾
         self.textBrowser_recv.moveCursor(QtGui.QTextCursor.End)
-    def send_msg(self,send_msg):
+
+    def send_msg(self, send_msg):
         '''
         功能函数,上位机在通过网口发送数据的时候将数据呈现在界面上
         :return:

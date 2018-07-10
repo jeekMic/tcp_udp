@@ -23,6 +23,7 @@ class MainWindow(tcp_logic.TcpLogic, udp_logic.UdpLogic, web_logic.WebLogic):
         self.setWindowIcon(QIcon("image/b.png"))
         # 打开软件时默认获取本机ip
         self.get_ip()
+        self.setWindowFlags(QtCore.Qt.Window)
 
 
 
@@ -81,9 +82,7 @@ class MainWindow(tcp_logic.TcpLogic, udp_logic.UdpLogic, web_logic.WebLogic):
             self.udp_client_start()
         if self.comboBox_tcp.currentIndex() == 4:
             self.web_server_start()
-        self.link = True
-        self.pushButton_unlink.setEnabled(True)
-        self.pushButton_link.setEnabled(False)
+
 
     def click_unlink(self):
         """
@@ -110,6 +109,15 @@ class MainWindow(tcp_logic.TcpLogic, udp_logic.UdpLogic, web_logic.WebLogic):
     def slotInformation(self):
         reply = QMessageBox.question(self, '提示', '确认现在对云台进行更新?', QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if reply == QMessageBox.Yes:
+            if self.combox_port_select.currentText() == "all connections":
+                reply_in = QMessageBox.question(self, '提示', '没有选择端口', QMessageBox.Yes | QMessageBox.No,
+                                             QMessageBox.No)
+                if reply_in ==QMessageBox.Yes:
+                    return
+                    pass
+                else:
+                    return
+                    pass
             self.tcp_send(init_code=Constant.update)
         else:
             pass

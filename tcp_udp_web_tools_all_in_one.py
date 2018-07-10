@@ -23,7 +23,6 @@ import inspect
 import re
 
 from constant import Constant
-from test import checkout_custom
 
 
 class Ui_TCP(QDialog):

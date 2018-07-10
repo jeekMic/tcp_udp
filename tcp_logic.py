@@ -59,10 +59,11 @@ class TcpLogic(tcp_udp_web_ui.ToolsUi):
                 self.contents.setText(data)
 
     def tcp_server_start(self):
-        print("-----开启服务器-----------")
-        if len(self.arrs)==0:
-            self.signal_write_msg.emit("【请加载bin文件,以免引起不必要的气场】\n")
-            self.signal_write_msg.emit("【请加载bin文件,以免引起不必要的气场】\n")
+        print("开启服务器...............")
+        if len(self.arrs) == 0:
+            self.signal_write_msg.emit("【请加载bin文件,以免引起不必要的异常】\n")
+            self.signal_write_msg.emit("【请加载bin文件,以免引起不必要的异常】\n")
+            return
         """
         功能函数，TCP服务端开启的方法
         :return: None
@@ -75,12 +76,16 @@ class TcpLogic(tcp_udp_web_ui.ToolsUi):
         # self.tcp_socket.setblocking(False)
         try:
             port = int(self.lineEdit_port.text())
-            self.tcp_socket.bind(('', port))
+            self.tcp_socket.bind(('', port))  # 监测本地IP地址 和指定的端口号
         except Exception as ret:
             msg = '请检查端口号\n'
             self.signal_write_msg.emit(msg)
+
         else:
             print("服务器正在监听---------")
+            self.link = True
+            self.pushButton_unlink.setEnabled(True)
+            self.pushButton_link.setEnabled(False)
             self.tcp_socket.listen()
             self.sever_th = threading.Thread(target=self.tcp_server_concurrency)
             self.sever_th.start()
@@ -91,7 +96,7 @@ class TcpLogic(tcp_udp_web_ui.ToolsUi):
         while True:
             clientsock, clientaddress = self.tcp_socket.accept()
             print('connect from:', clientaddress)
-            msg = "检测到 客户端 :" + str(clientaddress) + "已经连接\n"
+            msg = "【检测到 客户端 :" + str(clientaddress) + "已经连接】\n"
 
             self.set_port(clientaddress[1])
             self.signal_write_msg.emit(msg)
@@ -103,9 +108,10 @@ class TcpLogic(tcp_udp_web_ui.ToolsUi):
             t.start()
 
     def set_port(self, port):
-        '''
-        设置端口
-        '''
+        """
+        :param port: 连接上的端口号
+        :return: null
+        """
         id = self.combox_port_select.count()
         self.combox_port_select.insertItem(id, str(port))
 
@@ -119,8 +125,13 @@ class TcpLogic(tcp_udp_web_ui.ToolsUi):
                 index = int(self.combox_port_select.currentText())
             if addr[1] == index:
                 self.send_socket = sock
-
-            recvdata = sock.recv(2048)
+            try:
+                recvdata = sock.recv(2048)
+            except:
+                print("socket 出现异常数据")
+                sock.close()
+                self.send_socket = None
+                break
             result = []
             for i in recvdata:
                 result.append(hex(i))
@@ -177,7 +188,8 @@ class TcpLogic(tcp_udp_web_ui.ToolsUi):
             #     self.tcp_send(data=str(Constant.finish))
         elif code == 14:
             print("-------------", self.flag, "-------", self.total)
-            self.progressBar.setValue((100 / 35) * self.flag)
+            #self.progressBar.setValue((100 / 35) * self.flag)
+            self.signal_progress_msg.emit((100 / 35) * self.flag)
             if self.flag >= self.total:
                 self.signal_write_msg.emit("【结束包正在发送......】\n")
                 print("结束包正在发送---------\n")
@@ -201,7 +213,7 @@ class TcpLogic(tcp_udp_web_ui.ToolsUi):
             self.signal_write_msg.emit('【写入错误】\n')
             # self.get_error(self.flag-1)
         elif code == 39:
-            if res >= self.total-1:
+            if res >= self.total - 1:
                 self.signal_write_msg.emit("【远程程序发送命令错误，没有下一包数据可以发送了】")
                 return
             if len(self.arrs) == 0:
@@ -225,10 +237,18 @@ class TcpLogic(tcp_udp_web_ui.ToolsUi):
         elif code == 41:
             self.signal_write_msg.emit('【恢复成功】\n')
             self.set_visiable(is_visiable=1)
-        else:
-            print("-------------------其他异常")
-            print(code)
+        elif code == 35:
+            # 返回更新成功后需要初始化一些基本参数
+            self.flag = 0
+            self.limit = 0
+            self.need_packet_id = 0
+            self.flag = 0
+            self.temm = 1
             self.signal_write_msg.emit(self.show_message_error(code))
+            self.signal_progress_msg.emit(100)
+        else:
+            print("【位置异常,代号{}】".format(code))
+
 
     def tcp_client_start(self):
         """
