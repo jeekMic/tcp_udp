@@ -141,7 +141,7 @@ class TcpLogic(tcp_udp_web_ui.ToolsUi):
             self.signal_send_msg.emit("----------------------")
 
             code, res = Constant.parse_receive(result)
-            msg = '来自IP:{}端口:{}:\n{}\n{}'.format(addr[0], addr[1], recvdata, res)
+            msg = "收到远程发过来的数据,代号:"+str(code)+"\n"
             self.signal_write_msg.emit(msg)
             self.parse_code(code, res)
             if recvdata == 'exit' or not recvdata:
@@ -180,7 +180,7 @@ class TcpLogic(tcp_udp_web_ui.ToolsUi):
             #     self.tcp_send(data = str(Constant.finish))
             #     return
             self.tcp_send(data=''.join(self.arrs[self.flag]))
-            num_str = "已经发送数据包" + str(self.flag)
+            num_str = "\n【已经发送第" + str(self.flag+1)+"包数据】\n"
             self.signal_write_msg.emit(num_str)
             self.flag += 1
             # if self.flag == self.total:
@@ -189,7 +189,7 @@ class TcpLogic(tcp_udp_web_ui.ToolsUi):
         elif code == 14:
             print("-------------", self.flag, "-------", self.total)
             #self.progressBar.setValue((100 / 35) * self.flag)
-            self.signal_progress_msg.emit((100 / 35) * self.flag)
+            self.signal_progress_msg.emit((100 /(self.total+1)) * self.flag)
             if self.flag >= self.total:
                 self.signal_write_msg.emit("【结束包正在发送......】\n")
                 print("结束包正在发送---------\n")
@@ -200,7 +200,7 @@ class TcpLogic(tcp_udp_web_ui.ToolsUi):
                 return
 
             self.tcp_send(data=''.join(self.arrs[self.flag]))
-            num_str = "已经发送数据包" + str(self.flag) + "\n"
+            num_str = "\n【已经发送第" + str(self.flag+1)+"包数据】\n"
             self.signal_write_msg.emit(num_str)
             self.flag += 1
             # if self.flag == self.total:
@@ -294,7 +294,7 @@ class TcpLogic(tcp_udp_web_ui.ToolsUi):
             recv_msg = self.tcp_socket.recv(1024)
             if recv_msg:
                 msg = recv_msg.decode('utf-8')
-                msg = '【来自IP:{}端口:{}:】\n'.format(address[0], address[1])
+                msg = '\n【来自IP:{}端口:{}:】\n'.format(address[0], address[1])
                 self.signal_write_msg.emit(msg)
             else:
                 self.tcp_socket.close()
@@ -379,6 +379,8 @@ class TcpLogic(tcp_udp_web_ui.ToolsUi):
         :return:
         """
         if self.comboBox_tcp.currentIndex() == 0:
+            self.combox_port_select.clear()
+            self.combox_port_select.insertItem(0, "all connections")
             try:
 
                 for client, address in self.client_socket_lists:
@@ -433,7 +435,10 @@ class TcpLogic(tcp_udp_web_ui.ToolsUi):
 
     def read_bin(self, filename):
         self.reset_data()
-        length = int(os.path.getsize(filename) / 1024 + 0.5)
+        length = int(os.path.getsize(filename) / 1024)
+        if os.path.getsize(filename)/1024>length:
+            length = length+1
+        print("一共多少包:", length)
         file = open(filename, 'rb')
         i = 0
         arr = []
@@ -474,6 +479,8 @@ class TcpLogic(tcp_udp_web_ui.ToolsUi):
             i += 1
 
         self.total = m
+        print("总共有多少数据:----------")
+        print(self.total)
         file.close()
 
     def get_str(self, arrss):

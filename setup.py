@@ -10,7 +10,7 @@ base = None
 if sys.platform == "win64":
     base = "Win64GUI"
 
-setup(name="gui",
+setup(name="tcp_udp",
       version="8.1",
       description="application!",
       options={"build_exe": build_exe_options},
