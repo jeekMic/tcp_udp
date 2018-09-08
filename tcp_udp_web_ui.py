@@ -28,6 +28,7 @@ class ToolsUi(QDialog):
         self.setSizeGripEnabled(False)
 
         # 定义控件
+        self.pushButton_make_ip = QtWidgets.QPushButton()
         self.pushButton_get_ip = QtWidgets.QPushButton()
         self.pushButton_link = QtWidgets.QPushButton()
         self.pushButton_unlink = QtWidgets.QPushButton()
@@ -205,6 +206,7 @@ class ToolsUi(QDialog):
         # 右侧布局添加
         self.h_box_recv.addWidget(self.label_rev)
         self.h_box_recv.addWidget(self.pushButton_clear)
+        self.h_box_recv.addWidget(self.pushButton_make_ip)
         self.v_box_right.addLayout(self.h_box_recv)
 
         self.v_box_right.addWidget(self.textBrowser_recv)
@@ -239,10 +241,11 @@ class ToolsUi(QDialog):
         self.pushButton_unlink.setText(self._translate("TCP-UDP", "断开网络"))
         self.pushButton_get_ip.setText(self._translate("TCP-UDP", "开始更新"))
         self.pushButton_clear.setText(self._translate("TCP-UDP", "清除消息"))
+        self.pushButton_make_ip.setText(self._translate("TCP-UDP", "扫描IP"))
         self.pushButton_send.setText(self._translate("TCP-UDP", "发送"))
         self.pushButton_exit.setText(self._translate("TCP-UDP", "退出系统"))
         self.pushButton_dir.setText(self._translate("TCP-UDP", "选择路径"))
-        self.pushButton_else.setText(self._translate("TCP-UDP", "窗口多开"))
+        self.pushButton_else.setText(self._translate("TCP-UDP", "串口模式"))
         self.label_ip.setText(self._translate("TCP-UDP", "本机IP:"))
         self.label_port.setText(self._translate("TCP-UDP", "端口号:"))
         self.label_sendto.setText(self._translate("TCP-UDP", "目标IP:"))

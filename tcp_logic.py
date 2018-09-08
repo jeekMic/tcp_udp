@@ -3,7 +3,7 @@ import os
 from typing import Union
 
 from PyQt5 import QtWidgets
-from PyQt5.QtCore import QDir
+from PyQt5.QtCore import QDir, Qt, QObject
 from PyQt5.QtWidgets import QFileDialog
 
 import tcp_udp_web_ui
@@ -11,9 +11,12 @@ import socket
 import threading
 import sys
 import stopThreading
+from callscan import MyDialog
 from constant import Constant
 import binascii
 import struct
+
+from scan import Ui_Dialog
 
 
 class TcpLogic(tcp_udp_web_ui.ToolsUi):
@@ -36,7 +39,9 @@ class TcpLogic(tcp_udp_web_ui.ToolsUi):
         self.pushButton_backup.clicked.connect(self.send_backup)
         self.pushButton_restart_remote.clicked.connect(self.restart)
         # 初始化的时候加载bin文件 存储在这个数组里面
-
+        self.pushButton_make_ip.clicked.connect(self.make_ip)
+    def make_ip(self):
+        btnDemo.show()
     def restart(self):
         self.tcp_send(init_code=Constant.remote_restart)
 
@@ -138,7 +143,7 @@ class TcpLogic(tcp_udp_web_ui.ToolsUi):
             if len(result) < 5:
                 return
             self.signal_send_msg.emit(str(result) + "\n")
-            self.signal_send_msg.emit("----------------------")
+            self.signal_send_msg.emit("----------------------\n")
 
             code, res = Constant.parse_receive(result)
             msg = "收到远程发过来的数据,代号:"+str(code)+"\n"
@@ -532,5 +537,7 @@ class TcpLogic(tcp_udp_web_ui.ToolsUi):
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
     ui = TcpLogic(1)
+    btnDemo = MyDialog()
+
     ui.show()
     sys.exit(app.exec_())

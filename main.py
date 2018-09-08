@@ -8,6 +8,7 @@ import socket
 import sys
 import binascii
 
+from callscan import MyDialog
 from constant import Constant
 
 
@@ -191,13 +192,20 @@ class MainWindow(tcp_logic.TcpLogic, udp_logic.UdpLogic, web_logic.WebLogic):
         # 弹出一个消息框，提示开启了一个新的窗口
         QtWidgets.QMessageBox.warning(self,
                                       'TCP/UDP云台助手',
-                                      "已经禁止多窗口模式,有需要请与标哥联系",
+                                      "已经禁止串口模式,有需要请与标哥联系",
                                       QtWidgets.QMessageBox.Yes)
         # # 计数，开启了几个窗口
         # self.num = self.num + 1
         # # 开启新的窗口
         # self.another = MainWindow(self.num)
         # self.another.show()
+        # 在这里开启串口模式
+        # nn = ui_person.show()
+        # mm = ui.hide()
+
+        # myshow = Pyqt5_Serial()
+        # myshow.show()
+        # myshow.exec()
 
 
 if __name__ == '__main__':
